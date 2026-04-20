@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Transparency - Open Municipality of Bangued{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5 pb-5">
+    
+    <div class="mb-5">
+        <h2 class="fw-bold mb-4">Transparency</h2>
+        
+        <p class="fst-italic mb-4" style="font-size: 1.05rem;">
+            This Transparency Portal is an informative tool developed by the Municipal Government to empower you, the citizen, by promoting honesty and accountability in how we deliver our services.
+        </p>
+
+        <ul class="mb-5" style="list-style-type: disc; line-height: 2;">
+            <li><strong>Accountability:</strong> Making sure public officials answer directly to the people they serve.</li>
+            <li><strong>Participation:</strong> Creating clear ways for citizens to join in the development process and have a voice in local institutions.</li>
+            <li><strong>Predictability:</strong> Having fair, clear rules that are applied consistently and equally to everyone.</li>
+            <li><strong>Transparency:</strong> Keeping government information completely open and easily available to the general public.</li>
+        </ul>
+
+        <div class="row text-center align-items-center mt-5 mb-5">
+            <div class="col-md-4 mb-4">
+                <img src="{{ url_for('static', filename='img/transparency_seal.png') }}" alt="Philippine Transparency Seal" style="max-width: 180px; height: auto;">
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <a href="/login" title="Authorized Personnel Only">
+                    <img src="{{ url_for('static', filename='img/bangued_seal.png') }}" alt="Municipality of Bangued" style="max-width: 200px; height: auto; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                </a>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <img src="{{ url_for('static', filename='img/bagong_pilipinas.png') }}" alt="Bagong Pilipinas" style="max-width: 220px; height: auto;">
+            </div>
+        </div>
+    </div>
+
+    <br><br>
+
+    <div class="mt-5 pt-4">
+        <div class="text-center">
+            <h4 class="fw-bold mb-4">GOALS AND OBJECTIVES</h4>
+            
+            <ul class="list-unstyled fst-italic mx-auto" style="max-width: 800px; font-size: 1.05rem; line-height: 1.8;">
+                <li>• Build Complete Trust: Use secure technology to lock in project details and budgets, so no one can secretly change them after they are approved.</li>
+                <li class="mt-2">• Make Information Easy to Find: Use a friendly AI chatbot to help anyone quickly find the project updates they need.</li>
+                <li class="mt-2">• Improve Government Work: Make it faster and safer for local leaders and barangay officials to propose, approve, and track community projects.</li>
+                <li class="mt-2">• Encourage Citizen Involvement: Give ordinary people the power to easily check and verify government records themselves, so they feel more involved in their barangay.</li>
+            </ul>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

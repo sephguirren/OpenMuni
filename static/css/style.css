@@ -1,0 +1,80 @@
+/* Basic resets and fonts */
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* Dark Mode Overrides */
+body.dark-mode {
+    background-color: #121212;
+    color: #e0e0e0;
+}
+
+body.dark-mode .bg-light {
+    background-color: #1e1e1e !important;
+}
+
+body.dark-mode .navbar, 
+body.dark-mode .card,
+body.dark-mode .chatWindow {
+    background-color: #1e1e1e !important;
+    border-color: #333 !important;
+    color: #fff;
+}
+
+body.dark-mode .navbar-brand,
+body.dark-mode .nav-link {
+    color: #fff !important;
+}
+
+body.dark-mode .card-body.bg-light {
+    background-color: #2b2b2b !important;
+}
+
+/* =========================================
+   DARK MODE OVERRIDES
+   ========================================= */
+
+/* 1. Global Headings and Text (Fixes the Home Page) */
+body.dark-mode h1, body.dark-mode h2, body.dark-mode h3, body.dark-mode h4, body.dark-mode h5, body.dark-mode h6,
+[data-bs-theme="dark"] h1, [data-bs-theme="dark"] h2, [data-bs-theme="dark"] h3, [data-bs-theme="dark"] h4, [data-bs-theme="dark"] h5, [data-bs-theme="dark"] h6 {
+    color: #ffffff !important;
+}
+
+body.dark-mode .text-dark,
+[data-bs-theme="dark"] .text-dark {
+    color: #ffffff !important; /* Flips dark text to white */
+}
+
+body.dark-mode .text-muted,
+[data-bs-theme="dark"] .text-muted {
+    color: #adb5bd !important; /* Lighter, readable gray for muted text */
+}
+
+/* 2. Fix stray Icons that stay black */
+body.dark-mode i.text-dark,
+[data-bs-theme="dark"] i.text-dark {
+    color: #ffffff !important;
+}
+
+/* 3. Search Bar and Input Field Fixes */
+body.dark-mode .form-control,
+body.dark-mode .input-group-text,
+[data-bs-theme="dark"] .form-control,
+[data-bs-theme="dark"] .input-group-text {
+    background-color: #2b2b2b !important; /* Dark gray background */
+    color: #ffffff !important;            /* White text when typing */
+    border-color: #444444 !important;
+}
+
+/* Lighter placeholder text for the search bar */
+body.dark-mode .form-control::placeholder,
+[data-bs-theme="dark"] .form-control::placeholder {
+    color: #888888 !important;
+}
+
+/* Make sure the "bg-light" utility on the search bar doesn't stay white in dark mode */
+body.dark-mode .bg-light,
+[data-bs-theme="dark"] .bg-light {
+    background-color: #2b2b2b !important;
+}

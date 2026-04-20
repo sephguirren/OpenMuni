@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Open Municipality of Bangued{% endblock %}
+
+{% block content %}
+<div class="container d-flex align-items-center" style="min-height: 80vh;">
+    <div class="row w-100 align-items-center">
+        
+        <div class="col-md-6 pe-md-5 mb-5 mb-md-0">
+            <h1 class="display-4 fw-bolder mb-4" style="color: #2c3e50; line-height: 1.1;">
+                Open<br>Municipality
+            </h1>
+            <p class="lead text-muted mb-4" style="font-size: 1.1rem; max-width: 450px;">
+                OpenMuni ensures every public infrastructure project is recorded, verified, and accessible to all citizens.
+            </p>
+            <div class="d-flex gap-3">
+                <a href="/projects" class="btn btn-primary px-4 py-2 fw-semibold" style="background-color: #2b5598; border-color: #2b5598; border-radius: 6px;">
+                    Explore Projects
+                </a>
+                <a href="/about" class="btn btn-light px-4 py-2 fw-semibold text-dark border" style="background-color: #f8f9fa; border-radius: 6px;">
+                    Learn More
+                </a>
+            </div>
+        </div>
+
+        <div class="col-md-6 d-none d-md-block">
+            <div class="position-relative w-100 rounded-4 shadow-sm" style="height: 350px; overflow: hidden; background-color: #e9ecef;">
+                
+                <div id="landingCarousel" class="carousel slide carousel-fade h-100" data-bs-ride="carousel">
+                    <div class="carousel-indicators">
+                        <button type="button" data-bs-target="#landingCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                        <button type="button" data-bs-target="#landingCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                        <button type="button" data-bs-target="#landingCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                    </div>
+
+                    <div class="carousel-inner h-100">
+                        <div class="carousel-item active h-100" data-bs-interval="3000">
+                            <img src="{{ url_for('static', filename='img/hero1.jpg') }}" class="d-block w-100 h-100" style="object-fit: cover;" alt="Bangued Municipality 1">
+                        </div>
+                        <div class="carousel-item h-100" data-bs-interval="3000">
+                            <img src="{{ url_for('static', filename='img/hero2.jpg') }}" class="d-block w-100 h-100" style="object-fit: cover;" alt="Bangued Municipality 2">
+                        </div>
+                        <div class="carousel-item h-100" data-bs-interval="3000">
+                            <img src="{{ url_for('static', filename='img/hero3.png') }}" class="d-block w-100 h-100" style="object-fit: cover;" alt="Bangued Municipality 3">
+                        </div>
+                    </div>
+
+                    <button class="carousel-control-prev" type="button" data-bs-target="#landingCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#landingCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

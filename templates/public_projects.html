@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+
+{% block title %}Municipal Projects - OpenMuni{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5 pb-5">
+    
+    <h2 class="fw-bold mb-4">Municipal Projects</h2>
+    
+    <div class="row mb-4 align-items-center">
+        <div class="col-md-8 mb-3 mb-md-0">
+            <div class="d-flex flex-wrap gap-2" id="projectFilters">
+                <button class="btn btn-primary btn-sm px-4 filter-btn" data-filter="all" style="border-radius: 20px;">All Projects</button>
+                <button class="btn btn-light btn-sm px-4 border filter-btn" data-filter="proposed" style="border-radius: 20px;">Proposed</button>
+                <button class="btn btn-light btn-sm px-4 border filter-btn" data-filter="approved" style="border-radius: 20px;">Approved</button>
+                <button class="btn btn-light btn-sm px-4 border filter-btn" data-filter="in_progress" style="border-radius: 20px;">In Progress</button>
+                <button class="btn btn-light btn-sm px-4 border filter-btn" data-filter="completed" style="border-radius: 20px;">Completed</button>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="input-group">
+                <span class="input-group-text bg-light border-end-0 rounded-start-pill"><i class="bi bi-search text-muted"></i></span>
+                <input type="text" id="projectSearch" class="form-control bg-light border-start-0 rounded-end-pill" placeholder="Search projects by name, location...">
+            </div>
+        </div>
+    </div>
+
+    <div class="row" id="projectsContainer">
+        {% for project in projects %}
+        <div class="col-md-4 mb-4 project-card" data-status="{{ project.status }}" data-title="{{ project.title | lower }}" data-location="{{ project.barangay_name | lower }} {{ project.specific_location | lower }}">
+            <div class="card h-100 border-0 shadow-sm" style="background-color: #f4f5f7; border-radius: 12px;">
+                <div class="card-body p-4">
+                    
+                    <div class="text-end mb-2">
+                        {% if project.status == 'proposed' %}
+                            <small class="fw-bold text-warning">Proposed</small>
+                        {% elif project.status == 'approved' %}
+                            <small class="fw-bold text-primary">Approved</small>
+                        {% elif project.status == 'in_progress' %}
+                            <small class="fw-bold" style="color: #28a745;">In Progress</small>
+                        {% elif project.status == 'completed' %}
+                            <small class="fw-bold text-success">Completed</small>
+                        {% endif %}
+                    </div>
+
+                    <h5 class="fw-bold mb-3">{{ project.title }}</h5>
+                    
+                    <p class="text-muted mb-2" style="font-size: 0.9rem;">
+                        <i class="bi bi-geo-alt me-2"></i> {{ project.specific_location }}, {{ project.barangay_name }}
+                    </p>
+                    <p class="fw-bold text-dark mb-2" style="font-size: 0.95rem;">
+                        <strong>₱</strong> {{ "{:,.2f}".format(project.budget) }}
+                    </p>
+                    <p class="text-muted mb-3" style="font-size: 0.85rem;">
+                        <i class="bi bi-calendar3 me-2"></i> {{ project.start_date }} &mdash; {{ project.target_completion }}
+                    </p>
+
+                    <div class="collapse mt-4" id="viewMore{{ project.id }}">
+    
+                        <div id="carousel{{ project.id }}" class="carousel slide mb-3 rounded overflow-hidden" data-bs-ride="carousel">
+                            <div class="carousel-inner">
+                                
+                                {% if project.images %}
+                                    {% for image in project.images %}
+                                        <div class="carousel-item {% if loop.first %}active{% endif %}">
+                                            <img src="{{ url_for('static', filename='img/uploads/' ~ image) }}" class="d-block w-100" alt="Project Image" style="height: 200px; object-fit: cover;">
+                                        </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="carousel-item active">
+                                        <img src="{{ url_for('static', filename='img/bangued.png') }}" class="d-block w-100" alt="Placeholder Image" style="height: 200px; object-fit: cover;">
+                                    </div>
+                                {% endif %}
+
+                            </div>
+                            
+                            {% if project.images and project.images|length > 1 %}
+                            <div class="carousel-indicators" style="bottom: -15px;">
+                                {% for image in project.images %}
+                                    <button type="button" data-bs-target="#carousel{{ project.id }}" data-bs-slide-to="{{ loop.index0 }}" class="{% if loop.first %}active{% endif %} bg-dark"></button>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <p class="text-muted mt-4 mb-0" style="font-size: 0.9rem;">
+                            <i class="bi bi-person-badge me-2 text-dark"></i> {{ project.submitter_name }}
+                        </p>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <button class="btn btn-outline-dark btn-sm w-75 rounded-pill view-more-btn" type="button" data-bs-toggle="collapse" data-bs-target="#viewMore{{ project.id }}" aria-expanded="false" aria-controls="viewMore{{ project.id }}">
+                            View More
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12 text-center py-5">
+            <h5 class="text-muted">No public projects available at the moment.</h5>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // 1. View More / View Less Text Toggle
+        const viewMoreBtns = document.querySelectorAll('.view-more-btn');
+        viewMoreBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                setTimeout(() => {
+                    if (this.getAttribute('aria-expanded') === 'true') {
+                        this.innerText = 'View Less';
+                    } else {
+                        this.innerText = 'View More';
+                    }
+                }, 50);
+            });
+        });
+
+        // 2. Filter Tabs Logic
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const projectCards = document.querySelectorAll('.project-card');
+
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Clear the search bar when clicking a filter
+                document.getElementById('projectSearch').value = '';
+
+                // Update active button styling
+                filterBtns.forEach(b => {
+                    b.classList.remove('btn-primary');
+                    b.classList.add('btn-light');
+                });
+                this.classList.remove('btn-light');
+                this.classList.add('btn-primary');
+
+                const filterValue = this.getAttribute('data-filter');
+
+                // Show/Hide cards based on status
+                projectCards.forEach(card => {
+                    if (filterValue === 'all' || card.getAttribute('data-status') === filterValue) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        // 3. Search Bar Logic (FIXED!)
+        const searchInput = document.getElementById('projectSearch');
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            
+            projectCards.forEach(card => {
+                const title = card.getAttribute('data-title');
+                const location = card.getAttribute('data-location');
+                
+                if (title.includes(searchTerm) || location.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            // Just update the button visuals instead of artificially clicking them!
+            filterBtns.forEach(b => {
+                b.classList.remove('btn-primary');
+                b.classList.add('btn-light');
+            });
+            const allBtn = document.querySelector('[data-filter="all"]');
+            allBtn.classList.remove('btn-light');
+            allBtn.classList.add('btn-primary');
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}About - OpenMuni{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5 pb-5">
+    
+    <div class="row align-items-center mb-5">
+        <div class="col-md-8">
+            <h1 class="fw-bold mb-3" style="color: #2b5598;">About OpenMuni</h1>
+            <p class="lead text-muted">
+                Bridging the gap between the local government and the citizens through digital transparency, real-time tracking, and open communication.
+            </p>
+        </div>
+        <div class="col-md-4 text-center">
+            <img src="{{ url_for('static', filename='img/bangued_seal.png') }}" alt="Municipality Seal" class="img-fluid" style="max-width: 180px;">
+        </div>
+    </div>
+
+    <div class="row mb-5">
+        <div class="col-md-6 mb-4">
+            <div class="card h-100 border-0 shadow-sm" style="border-radius: 12px; background-color: #f8f9fa;">
+                <div class="card-body p-4">
+                    <div class="mb-3"><i class="bi bi-bullseye fs-1 text-primary"></i></div>
+                    <h4 class="fw-bold">Our Mission</h4>
+                    <p class="text-muted">To provide every citizen with accessible, accurate, and up-to-date information regarding municipal projects and budget allocations, ensuring that public funds are utilized effectively for community development.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card h-100 border-0 shadow-sm" style="border-radius: 12px; background-color: #f8f9fa;">
+                <div class="card-body p-4">
+                    <div class="mb-3"><i class="bi bi-eye-fill fs-1 text-success"></i></div>
+                    <h4 class="fw-bold">Our Vision</h4>
+                    <p class="text-muted">A municipality where governance is entirely transparent, citizens are actively engaged in proposing infrastructure improvements, and every public project is tracked from proposal to completion.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mb-5 text-center">
+        <h3 class="fw-bold mb-4">Core Pillars of the System</h3>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <i class="bi bi-wallet2 fs-1 text-dark mb-2"></i>
+                <h5 class="fw-bold">Financial Transparency</h5>
+                <p class="text-muted small">Citizens can view the exact budget allocated and spent for every infrastructure project.</p>
+            </div>
+            <div class="col-md-4">
+                <i class="bi bi-chat-right-text fs-1 text-dark mb-2"></i>
+                <h5 class="fw-bold">24/7 AI Assistance</h5>
+                <p class="text-muted small">An intelligent chatbot is available around the clock to answer specific questions about project statuses and timelines.</p>
+            </div>
+            <div class="col-md-4">
+                <i class="bi bi-people fs-1 text-dark mb-2"></i>
+                <h5 class="fw-bold">Civic Participation</h5>
+                <p class="text-muted small">Empowering barangay officials and citizens to propose necessary projects directly to the municipal council.</p>
+            </div>
+        </div>
+    </div>
+
+    <hr class="mb-5 text-muted">
+
+    <div class="row pb-4">
+        <div class="col-md-7 mb-4">
+            <h4 class="fw-bold mb-3">Municipal Office</h4>
+            <p class="text-muted mb-4">We welcome your feedback and inquiries. Please visit us during standard government working hours or reach out through our official contact channels.</p>
+            
+            <ul class="list-unstyled text-muted">
+                <li class="mb-3"><i class="bi bi-geo-alt-fill text-danger me-2"></i> <strong>Address:</strong> Bangued Municipal Hall Building, Rizal St. Zone 5 Bangued, Abra</li>
+                <li class="mb-3"><i class="bi bi-telephone-fill text-primary me-2"></i> <strong>Phone:</strong> (074)-614-1664</li>
+                <li class="mb-3"><i class="bi bi-envelope-fill text-warning me-2"></i> <strong>Email:</strong> abra.banguedlgu1@gmail.com</li>
+                <li class="mb-3"><i class="bi bi-clock-fill text-success me-2"></i> <strong>Office Hours:</strong> Monday - Friday, 8:00 AM - 5:00 PM</li>
+            </ul>
+        </div>
+        
+        <div class="col-md-5">
+            <div class="card border-0 shadow-sm p-0" style="border-radius: 12px; overflow: hidden; height: 100%; min-height: 300px;">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3803.133537820444!2d120.61850629999999!3d17.596392599999998!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x338e5c00c7e238e1%3A0xe80ca48578158e75!2sTown%20Hall%20of%20Bangued!5e0!3m2!1sen!2sph!4v1772630250344!5m2!1sen!2sph" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

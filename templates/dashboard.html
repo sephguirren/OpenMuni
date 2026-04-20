@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workspace - Open Municipality</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    
+    <style>
+        body { background-color: #f8f9fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; }
+        
+        /* Sidebar Styling */
+        .sidebar { height: 100vh; width: 250px; position: fixed; top: 0; left: 0; background-color: #ffffff; padding-top: 20px; border-right: 1px solid #e9ecef; z-index: 1000; }
+        .sidebar .nav-link { color: #555; font-weight: 500; margin: 5px 15px; border-radius: 8px; padding: 10px 15px; cursor: pointer; transition: 0.2s; }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active { background-color: #fff3cd; color: #000; font-weight: bold; }
+        
+        /* Main Content Area */
+        .main-content { margin-left: 250px; padding: 30px; min-height: 100vh; }
+        
+        /* Status Cards */
+        .status-card { border: none; border-radius: 12px; color: white; overflow: hidden; }
+        .status-card .card-body { padding: 20px; }
+        .status-card .card-footer { background-color: rgba(0,0,0,0.15); border: none; padding: 10px 20px; font-size: 0.85rem; display: flex; justify-content: space-between; align-items: center; text-decoration: none; color: white; cursor: pointer; }
+        .status-card .card-footer:hover { background-color: rgba(0,0,0,0.25); color: white; }
+        
+        /* Custom Colors */
+        .bg-proposed { background-color: #cc5500; } 
+        .bg-approved { background-color: #3b5998; } 
+        .bg-progress { background-color: #7cb342; } 
+        .bg-completed { background-color: #558b2f; } 
+
+        /* White Widget Panels */
+        .widget-panel { background-color: #ffffff; border-radius: 12px; border: none; box-shadow: 0 4px 6px rgba(0,0,0,0.02); height: 100%; }
+        
+        /* History Feed Customization */
+        .history-item { border-left: 2px solid #e9ecef; padding-left: 15px; position: relative; margin-bottom: 20px; }
+        .history-item::before { content: ''; position: absolute; left: -6px; top: 0; width: 10px; height: 10px; border-radius: 50%; background-color: #2b5598; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar d-flex flex-column">
+        <h4 class="fw-bold px-4 mb-4" style="color: #2b5598;"><i class="bi bi-building me-2"></i> Open Muni</h4>
+        <nav class="nav flex-column mb-auto">
+            {% if session['role']|lower == 'super_admin' %}
+                <a class="nav-link active" id="nav-dashboard" onclick="switchTab('dashboard')"><i class="bi bi-grid-fill me-2"></i> Dashboard</a>
+                <a class="nav-link" id="nav-projects" onclick="switchTab('projects')"><i class="bi bi-folder-fill me-2"></i> Projects</a>
+                <a class="nav-link" id="nav-barangay" onclick="switchTab('barangay')"><i class="bi bi-geo-alt-fill me-2"></i> Barangay</a>
+                <a class="nav-link" id="nav-officials" onclick="switchTab('officials')"><i class="bi bi-people-fill me-2"></i> Officials</a>
+            {% else %}
+                <a class="nav-link active" id="nav-projects" onclick="switchTab('projects')"><i class="bi bi-folder-fill me-2"></i> My Projects</a>
+            {% endif %}
+        </nav>
+        <div class="mt-auto mb-4 px-3">
+            <div class="bg-light rounded p-3 text-center">
+                <span class="badge bg-secondary mb-2">{{ session['role'].replace('_', ' ').title() }}</span><br>
+                <a href="/logout" class="btn btn-sm btn-outline-danger w-100 rounded-pill"><i class="bi bi-box-arrow-right me-1"></i> Logout</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        
+        <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+            <div>
+                <span class="text-muted fs-5" id="timeGreeting">Good Morning, </span>
+                <span class="fw-bold fs-4 text-dark">{{ session['full_name'] }}</span>
+                
+                <script>
+                    (function() {
+                        const hour = new Date().getHours();
+                        const greetingSpan = document.getElementById('timeGreeting');
+                        if (hour >= 5 && hour < 12) {
+                            greetingSpan.innerText = "Good Morning, ";
+                        } else if (hour >= 12 && hour < 18) {
+                            greetingSpan.innerText = "Good Afternoon, ";
+                        } else {
+                            greetingSpan.innerText = "Good Evening, ";
+                        }
+                    })();
+                </script>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                {% if session['role']|lower == 'super_admin' %}
+                <div class="position-relative" style="cursor: pointer;" data-bs-toggle="offcanvas" data-bs-target="#notificationPanel">
+                    <i class="bi bi-bell-fill text-muted fs-5"></i>
+                    <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"></span>
+                </div>
+                {% endif %}
+                
+                <img src="https://ui-avatars.com/api/?name={{ session['full_name'] }}&background=2b5598&color=fff&rounded=true" alt="Profile" style="width: 40px; height: 40px;">
+            </div>
+        </div>
+
+        {% if session['role']|lower == 'super_admin' %}
+        <div id="view-dashboard">
+            <h3 class="fw-bold mb-4">Dashboard Overview</h3>
+
+            <div class="row g-4 mb-5">
+                <div class="col-md-3">
+                    <div class="card status-card bg-proposed shadow-sm">
+                        <div class="card-body"><h4 class="fw-bold mb-0">Proposed</h4></div>
+                        <div class="card-footer" onclick="goToFilteredProjects('proposed')">View Details <i class="bi bi-chevron-right"></i></div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card status-card bg-approved shadow-sm">
+                        <div class="card-body"><h4 class="fw-bold mb-0">Approved</h4></div>
+                        <div class="card-footer" onclick="goToFilteredProjects('approved')">View Details <i class="bi bi-chevron-right"></i></div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card status-card bg-progress shadow-sm">
+                        <div class="card-body"><h4 class="fw-bold mb-0">In Progress</h4></div>
+                        <div class="card-footer" onclick="goToFilteredProjects('in_progress')">View Details <i class="bi bi-chevron-right"></i></div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card status-card bg-completed shadow-sm">
+                        <div class="card-body"><h4 class="fw-bold mb-0">Completed</h4></div>
+                        <div class="card-footer" onclick="goToFilteredProjects('completed')">View Details <i class="bi bi-chevron-right"></i></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="card widget-panel p-4">
+                        <h5 class="fw-bold mb-1">Total Expenses</h5>
+                        <p class="text-muted small mb-4">This chart shows the expenses across all barangays</p>
+                        <div style="height: 250px;"><canvas id="expensesChart"></canvas></div>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="card widget-panel p-4 d-flex justify-content-center align-items-center">
+                        <h6 class="fw-bold w-100 text-center mb-3">Project Status</h6>
+                        <div style="height: 200px; width: 100%;"><canvas id="statusDonutChart"></canvas></div>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="card widget-panel p-4 overflow-auto" style="max-height: 350px;">
+                        <h5 class="fw-bold mb-4">History</h5>
+                        {% for log in all_logs[:5] %}
+                        <div class="history-item">
+                            <p class="mb-0 fw-semibold" style="font-size: 0.9rem;">{{ log.full_name }}</p>
+                            <p class="text-muted mb-0" style="font-size: 0.8rem;">{{ log.action_description }}</p>
+                            <small class="text-muted" style="font-size: 0.7rem;">{{ log.time_ago }}</small>
+                        </div>
+                        {% else %}
+                        <p class="text-muted small">No recent activity found.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="col-md-12 mt-4 mb-2">
+                    <div class="card widget-panel p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="fw-bold mb-0">Active Officials</h5>
+                            <button class="btn btn-sm btn-outline-primary" onclick="switchTab('officials')">View All</button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr><th>Full Name</th><th>Username</th><th>Assigned Barangay</th><th>Last Active</th></tr>
+                                </thead>
+                                <tbody>
+                                    {% for admin in sub_admins %}
+                                    <tr>
+                                        <td class="fw-semibold">{{ admin.full_name }}</td>
+                                        <td class="text-muted">{{ admin.username }}</td>
+                                        <td><span class="badge bg-secondary">{{ admin.barangay_name }}</span></td>
+                                        <td><small class="text-muted"><i class="bi bi-clock me-1"></i> {{ admin.last_login or 'Never logged in' }}</small></td>
+                                    </tr>
+                                    {% else %}
+                                    <tr><td colspan="4" class="text-center text-muted py-3">No active officials.</td></tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div> </div> {% endif %}
+
+        <div id="view-projects" style="display: {% if session['role']|lower == 'super_admin' %}none{% else %}block{% endif %};">
+            
+            <div class="row mb-4 align-items-center">
+                <div class="col-md-8 mb-3 mb-md-0 d-flex gap-3">
+                    <div class="input-group w-50 shadow-sm rounded-pill">
+                        <span class="input-group-text bg-white border-end-0 rounded-start-pill"><i class="bi bi-search text-muted"></i></span>
+                        <input type="text" id="dashboardSearch" class="form-control border-start-0 rounded-end-pill" placeholder="Search projects by name, location...">
+                    </div>
+                    
+                    {% if session['role']|lower == 'sub_admin' %}
+                        <button class="btn btn-dark fw-semibold" data-bs-toggle="modal" data-bs-target="#proposeModal" style="border-radius: 8px;">
+                            <i class="bi bi-plus-lg me-1"></i> Propose Project
+                        </button>
+                    {% elif session['role']|lower == 'super_admin' %}
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-primary fw-semibold shadow-sm" data-bs-toggle="modal" data-bs-target="#addAdminModal" style="background-color: #2b5598; border: none; border-radius: 8px;">
+                                <i class="bi bi-person-plus-fill me-1"></i> Add Admin
+                            </button>
+                            <div class="dropdown">
+                                <button class="btn btn-dark fw-semibold dropdown-toggle shadow-sm" type="button" data-bs-toggle="dropdown" style="border-radius: 8px;">
+                                    <i class="bi bi-gear-fill me-1"></i> Manage
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end shadow border-0" style="border-radius: 12px; font-size: 0.9rem;">
+                                    <li><a class="dropdown-item py-2" href="#" onclick="switchTab('officials')"><i class="bi bi-people-fill me-2 text-dark"></i>Manage Admins</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item py-2" href="#" onclick="addNewBarangay()"><i class="bi bi-geo-alt-fill me-2 text-success"></i>Add Barangay</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="d-flex flex-wrap gap-2 mb-4" id="dashboardFilters">
+                <button class="btn btn-primary btn-sm px-4 filter-btn" data-filter="all" style="border-radius: 20px;">All Projects</button>
+                <button class="btn btn-light btn-sm px-4 border filter-btn" data-filter="proposed" style="border-radius: 20px;">Proposed</button>
+                <button class="btn btn-light btn-sm px-4 border filter-btn" data-filter="approved" style="border-radius: 20px;">Approved</button>
+                <button class="btn btn-light btn-sm px-4 border filter-btn" data-filter="in_progress" style="border-radius: 20px;">In Progress</button>
+                <button class="btn btn-light btn-sm px-4 border filter-btn" data-filter="completed" style="border-radius: 20px;">Completed</button>
+            </div>
+
+            <div class="row" id="dashboardProjectsContainer">
+                {% for project in projects %}
+                <div class="col-md-4 mb-4 project-card" data-status="{{ project.status }}" data-title="{{ project.title | lower }}" data-location="{{ project.barangay_name | lower }} {{ project.specific_location | lower }}">
+                    <div class="card h-100 border-0 shadow-sm" style="background-color: #ffffff; border-radius: 12px;">
+                        <div class="card-body p-4 position-relative">
+                            
+                            {% if session['role']|lower == 'super_admin' %}
+                            <button class="btn btn-sm btn-link text-danger position-absolute" style="bottom: 15px; right: 15px; z-index: 10;" title="Delete Project" onclick="deleteProject({{ project.id }})">
+                                <i class="bi bi-trash-fill fs-5"></i>
+                            </button>
+                            <div class="mt-3">
+                                <label class="form-label fw-bold text-muted" style="font-size: 0.85rem;">Update Project Status:</label>
+                                <select class="form-select form-select-sm status-updater" data-project-id="{{ project.id }}">
+                                    <option value="proposed" {% if project.status == 'proposed' %}selected{% endif %}>Proposed</option>
+                                    <option value="approved" {% if project.status == 'approved' %}selected{% endif %}>Approved</option>
+                                    <option value="in_progress" {% if project.status == 'in_progress' %}selected{% endif %}>In Progress</option>
+                                    <option value="completed" {% if project.status == 'completed' %}selected{% endif %}>Completed</option>
+                                </select>
+                            </div>
+                            {% endif %}
+
+                            <div class="text-end mb-2">
+                                {% if project.status == 'proposed' %}
+                                    <span class="badge" style="background-color: #cc5500;">Proposed</span>
+                                {% elif project.status == 'approved' %}
+                                    <span class="badge" style="background-color: #3b5998;">Approved</span>
+                                {% elif project.status == 'in_progress' %}
+                                    <span class="badge" style="background-color: #7cb342;">In Progress</span>
+                                {% elif project.status == 'completed' %}
+                                    <span class="badge" style="background-color: #558b2f;">Completed</span>
+                                {% endif %}
+                            </div>
+
+                            <h5 class="fw-bold mb-3">{{ project.title }}</h5>
+                            <p class="text-muted mb-2" style="font-size: 0.9rem;"><i class="bi bi-geo-alt me-2"></i> {{ project.specific_location }}, {{ project.barangay_name }}</p>
+                            <p class="fw-bold text-dark mb-2" style="font-size: 0.95rem;"><strong>₱</strong> {{ "{:,.2f}".format(project.budget) }}</p>
+                            <p class="text-muted mb-4" style="font-size: 0.85rem;"><i class="bi bi-calendar3 me-2"></i> {{ project.start_date }} &mdash; {{ project.target_completion }}</p>
+
+                            <div class="text-center mt-auto" style="padding-right: 35px;">
+                                {% if project.status == 'proposed' %}
+                                    {% if session['role']|lower == 'super_admin' %}
+                                        <button class="btn w-100 fw-bold rounded-pill text-white shadow-sm" style="background-color: #d35400;" onclick="approveProject({{ project.id }})">Approve</button>
+                                    {% else %}
+                                        <button class="btn btn-outline-dark w-100 rounded-pill" disabled style="font-size: 0.8rem;">Awaiting Approval</button>
+                                    {% endif %}
+                                {% elif project.status == 'approved' %}
+                                    <button class="btn btn-outline-dark w-100 rounded-pill" disabled>Approved</button>
+                                {% elif project.status == 'in_progress' %}
+                                    {% if session['role']|lower == 'sub_admin' %}
+                                        <button class="btn btn-outline-dark w-100 rounded-pill" data-bs-toggle="modal" data-bs-target="#uploadModal" onclick="document.getElementById('uploadProjectId').value = {{ project.id }};">Upload Picture</button>
+                                    {% else %}
+                                        <button class="btn btn-outline-dark w-100 rounded-pill" disabled>In Progress</button>
+                                    {% endif %}
+                                {% elif project.status == 'completed' %}
+                                    <button class="btn btn-outline-dark w-100 rounded-pill" disabled>Completed</button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div id="view-barangay" style="display: none;">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="fw-bold">Municipality Barangays</h3>
+                <button class="btn btn-primary fw-semibold shadow-sm" style="background-color: #2b5598; border: none; border-radius: 8px;" onclick="addNewBarangay()">
+                    <i class="bi bi-plus-lg me-1"></i> Add Barangay
+                </button>
+            </div>
+            
+            <div class="row g-4">
+                {% for b in barangays %}
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm" style="border-radius: 12px;">
+                        <div class="card-body p-4 text-center">
+                            <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                                <i class="bi bi-geo-alt-fill text-danger fs-3"></i>
+                            </div>
+                            <h5 class="fw-bold mb-1">{{ b.name }}</h5>
+                            <p class="text-muted small mb-0">
+                                Managed by: <span class="fw-semibold text-dark">{{ b.manager_name or 'No Admin Assigned' }}</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div id="view-officials" style="display: none;">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="fw-bold">Manage Officials</h3>
+                <button class="btn btn-primary fw-semibold shadow-sm" data-bs-toggle="modal" data-bs-target="#addAdminModal" style="background-color: #2b5598; border: none; border-radius: 8px;">
+                    <i class="bi bi-person-plus-fill me-1"></i> Add Official
+                </button>
+            </div>
+
+            <div class="card border-0 shadow-sm" style="border-radius: 12px;">
+                <div class="card-body p-0">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-4 py-3">Official Details</th>
+                                <th>Assigned Barangay</th>
+                                <th>Last Active</th>
+                                <th class="text-end pe-4">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for admin in sub_admins %}
+                            <tr>
+                                <td class="ps-4 py-3">
+                                    <p class="mb-0 fw-bold">{{ admin.full_name }}</p>
+                                    <p class="mb-0 text-muted small">@{{ admin.username }}</p>
+                                </td>
+                                <td><span class="badge" style="background-color: #3b5998;">{{ admin.barangay_name }}</span></td>
+                                <td><small class="text-muted fw-semibold">{{ admin.last_login or 'Never logged in' }}</small></td>
+                                <td class="text-end pe-4">
+                                    <button class="btn btn-sm btn-light border text-primary me-2" onclick="editAdmin({{ admin.id }}, '{{ admin.full_name }}')" title="Edit Official">
+                                        <i class="bi bi-pencil-fill"></i> Edit
+                                    </button>
+                                    <button class="btn btn-sm btn-light border text-danger" onclick="fireAdmin({{ admin.id }})" title="Remove Official">
+                                        <i class="bi bi-person-x-fill"></i> Fire
+                                    </button>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="4" class="text-center text-muted py-5">No officials found. Add one to get started.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="proposeModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="background-color: #f4f5f7; border-radius: 16px;">
+                <div class="modal-header border-0 pb-0"><h5 class="modal-title fw-bold">New Project Proposal</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body">
+                    <form action="/propose_project" method="POST">
+                        <div class="mb-3"><label class="form-label text-muted fw-semibold" style="font-size: 0.8rem;">Project Title</label><div class="input-group"><span class="input-group-text bg-white border-end-0"><i class="bi bi-file-text text-muted"></i></span><input type="text" name="title" class="form-control border-start-0" required></div></div>
+                        <div class="mb-3"><label class="form-label text-muted fw-semibold" style="font-size: 0.8rem;">Specific Location</label><div class="input-group"><span class="input-group-text bg-white border-end-0"><i class="bi bi-geo-alt text-muted"></i></span><input type="text" name="specific_location" class="form-control border-start-0" required></div></div>
+                        <div class="mb-3"><label class="form-label text-muted fw-semibold" style="font-size: 0.8rem;">Allocated Budget (PHP)</label><div class="input-group"><span class="input-group-text bg-white border-end-0 fw-bold">₱</span><input type="number" step="0.01" name="budget" class="form-control border-start-0" required></div></div>
+                        <div class="row mb-4"><div class="col-6"><label class="form-label text-muted fw-semibold" style="font-size: 0.8rem;">Start Date</label><input type="date" name="start_date" class="form-control" required></div><div class="col-6"><label class="form-label text-muted fw-semibold" style="font-size: 0.8rem;">Target Completion</label><input type="date" name="target_completion" class="form-control" required></div></div>
+                        <div class="d-flex justify-content-end gap-2"><button type="button" class="btn btn-light bg-white border" data-bs-dismiss="modal">Cancel</button><button type="submit" class="btn btn-primary" style="background-color: #2b5598; border: none;">Submit Proposal</button></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="uploadModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 16px;">
+                <div class="modal-header border-0 pb-0"><h5 class="modal-title fw-bold">Upload Project Update</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body">
+                    <form id="uploadPhotoForm" enctype="multipart/form-data">
+                        <input type="hidden" id="uploadProjectId" name="project_id">
+                        <div class="mb-4"><label class="form-label text-muted fw-semibold" style="font-size: 0.8rem;">Select Image (JPG, PNG)</label><input class="form-control" type="file" id="photoFile" name="photo" accept="image/png, image/jpeg" required></div>
+                        <button type="button" class="btn w-100 btn-dark rounded-pill" onclick="submitPhoto()">Upload Image</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="addAdminModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="background-color: #f4f5f7; border-radius: 16px;">
+                <div class="modal-header border-0 pb-0"><h5 class="modal-title fw-bold">Add New Sub-Admin</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body">
+                    <form action="/add_admin" method="POST">
+                        <div class="mb-3"><label class="form-label text-muted fw-semibold" style="font-size: 0.8rem;">Full Name</label><input type="text" name="full_name" class="form-control" required placeholder="e.g., Juan Dela Cruz"></div>
+                        <div class="mb-3"><label class="form-label text-muted fw-semibold" style="font-size: 0.8rem;">Username</label><input type="text" name="username" class="form-control" required placeholder="e.g., juan_admin"></div>
+                        <div class="mb-3"><label class="form-label text-muted fw-semibold" style="font-size: 0.8rem;">Assign Barangay</label><select name="barangay_id" class="form-select" required>{% for b in barangays %}<option value="{{ b.id }}">{{ b.name }}</option>{% endfor %}</select></div>
+                        <div class="row mb-4"><div class="col-6"><label class="form-label text-muted fw-semibold" style="font-size: 0.8rem;">Password</label><input type="password" name="password" class="form-control" required></div><div class="col-6"><label class="form-label text-muted fw-semibold" style="font-size: 0.8rem;">Confirm Password</label><input type="password" name="confirm_password" class="form-control" required></div></div>
+                        <div class="d-flex justify-content-end gap-2"><button type="button" class="btn btn-light bg-white border" data-bs-dismiss="modal">Cancel</button><button type="submit" class="btn btn-primary" style="background-color: #2b5598; border: none;">Create Account</button></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="offcanvas offcanvas-end shadow" tabindex="-1" id="notificationPanel">
+        <div class="offcanvas-header border-bottom bg-light">
+            <h5 class="offcanvas-title fw-bold" style="color: #2b5598;"><i class="bi bi-clock-history me-2"></i> System Activity</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+        </div>
+        <div class="offcanvas-body p-0">
+            <ul class="list-group list-group-flush">
+                {% for log in all_logs %}
+                <li class="list-group-item p-3 border-bottom position-relative hover-bg-light">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="mb-1 fw-bold text-dark" style="font-size: 0.9rem;">{{ log.full_name }}</p>
+                            <p class="mb-1 text-muted" style="font-size: 0.85rem;">{{ log.action_description }}</p>
+                            <small class="text-secondary" style="font-size: 0.75rem;">{{ log.time_ago }}</small>
+                        </div>
+                        <button class="btn btn-sm btn-link text-danger p-0 ms-2" title="Delete Log" onclick="deleteActivityLog({{ log.id }})">
+                            <i class="bi bi-x-circle-fill fs-5"></i>
+                        </button>
+                    </div>
+                </li>
+                {% else %}
+                <div class="p-4 text-center text-muted">No activity logs recorded yet.</div>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        // --- UI SWITCHING LOGIC ---
+        function switchTab(tabName) {
+            document.querySelectorAll('.sidebar .nav-link').forEach(link => link.classList.remove('active'));
+            const clickedLink = document.getElementById('nav-' + tabName);
+            if (clickedLink) clickedLink.classList.add('active');
+            
+            const views = {
+                'dashboard': document.getElementById('view-dashboard'),
+                'projects': document.getElementById('view-projects'),
+                'barangay': document.getElementById('view-barangay'),
+                'officials': document.getElementById('view-officials')
+            };
+
+            for (let key in views) {
+                if (views[key]) {
+                    views[key].style.display = (key === tabName) ? 'block' : 'none';
+                }
+            }
+        }
+
+        function goToFilteredProjects(status) {
+            switchTab('projects');
+            const btn = document.querySelector(`.filter-btn[data-filter="${status}"]`);
+            if(btn) btn.click();
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            
+            // --- DYNAMIC CHART.JS LOGIC ---
+            const expensesCanvas = document.getElementById('expensesChart');
+            if (expensesCanvas) {
+                const ctxLine = expensesCanvas.getContext('2d');
+                let gradientOrange = ctxLine.createLinearGradient(0, 0, 0, 250);
+                gradientOrange.addColorStop(0, 'rgba(230, 126, 34, 0.4)'); 
+                gradientOrange.addColorStop(1, 'rgba(230, 126, 34, 0.0)');
+
+                let gradientBlack = ctxLine.createLinearGradient(0, 0, 0, 250);
+                gradientBlack.addColorStop(0, 'rgba(0, 0, 0, 0.3)'); 
+                gradientBlack.addColorStop(1, 'rgba(0, 0, 0, 0.0)');
+
+                new Chart(ctxLine, {
+                    type: 'line',
+                    data: {
+                        labels: {{ chart_years | safe }},
+                        datasets: [
+                            { label: 'Total Budget Allocated', data: {{ chart_budgets | tojson }}, borderColor: '#3b5998', backgroundColor: 'rgba(59, 89, 152, 0.2)', fill: true, tension: 0.4, pointRadius: 4 },
+                            { label: 'Current Expenses', data: {{ chart_expenses | tojson }}, borderColor: '#cc5500', backgroundColor: 'rgba(204, 85, 0, 0.2)', fill: true, tension: 0.4, pointRadius: 4 }
+                        ]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false } }, y: { grid: { borderDash: [5, 5] }, beginAtZero: true } } }
+                });
+
+                const ctxDonut = document.getElementById('statusDonutChart').getContext('2d');
+                new Chart(ctxDonut, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Proposed', 'Approved', 'In Progress', 'Completed'],
+                        datasets: [{ data: {{ donut_data | tojson }}, backgroundColor: ['#cc5500', '#3b5998', '#7cb342', '#558b2f'], borderWidth: 0 }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 8, padding: 15 } } } }
+                });
+            }
+
+            // --- EXISTING PROJECT LOGIC ---
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            const projectCards = document.querySelectorAll('.project-card');
+
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.getElementById('dashboardSearch').value = '';
+                    filterBtns.forEach(b => { b.classList.remove('btn-primary'); b.classList.add('btn-light'); });
+                    this.classList.remove('btn-light'); this.classList.add('btn-primary');
+                    const filterValue = this.getAttribute('data-filter');
+                    projectCards.forEach(card => {
+                        if (filterValue === 'all' || card.getAttribute('data-status') === filterValue) card.style.display = 'block';
+                        else card.style.display = 'none';
+                    });
+                });
+            });
+
+            const statusDropdowns = document.querySelectorAll('.status-updater');
+            statusDropdowns.forEach(dropdown => {
+                dropdown.addEventListener('change', async function() {
+                    const projectId = this.getAttribute('data-project-id');
+                    const newStatus = this.value;
+                    try {
+                        const response = await fetch(`/api/update_status/${projectId}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: newStatus }) });
+                        const data = await response.json();
+                        if(data.status === 'success') { alert("✅ " + data.message); } 
+                        else { alert("❌ Error: " + data.message); location.reload(); }
+                    } catch (error) { console.error("Error:", error); alert("Failed to communicate."); }
+                });
+            });
+
+            const searchInput = document.getElementById('dashboardSearch');
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    const searchTerm = this.value.toLowerCase();
+                    projectCards.forEach(card => {
+                        if (card.innerText.toLowerCase().includes(searchTerm)) card.style.display = 'block';
+                        else card.style.display = 'none';
+                    });
+                    filterBtns.forEach(b => { b.classList.remove('btn-primary'); b.classList.add('btn-light'); });
+                    document.querySelector('[data-filter="all"]').classList.remove('btn-light');
+                    document.querySelector('[data-filter="all"]').classList.add('btn-primary');
+                });
+            }
+        });
+
+        async function approveProject(projectId) {
+            if(confirm("Approve this project?")) {
+                try {
+                    const response = await fetch(`/api/update_status/${projectId}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'approved' }) });
+                    const data = await response.json();
+                    if(data.status === 'success') { alert(data.message); location.reload(); } else { alert("Error: " + data.message); }
+                } catch (error) { alert("Failed to communicate."); }
+            }
+        }
+
+        async function deleteProject(projectId) {
+            if(confirm("⚠️ Permanently delete this project?")) {
+                try {
+                    const response = await fetch(`/api/delete_project/${projectId}`, { method: 'POST', headers: { 'Content-Type': 'application/json' } });
+                    const data = await response.json();
+                    if(data.status === 'success') { alert(data.message); location.reload(); } else { alert("Error: " + data.message); }
+                } catch (error) { alert("Failed to communicate."); }
+            }
+        }
+
+        async function submitPhoto() {
+            const form = document.getElementById('uploadPhotoForm');
+            const formData = new FormData(form);
+            const fileInput = document.getElementById('photoFile');
+            if (!fileInput.value) { alert("Select an image file first."); return; }
+            try {
+                const btn = document.querySelector('#uploadModal .btn-dark');
+                btn.innerText = "Uploading..."; btn.disabled = true;
+                const response = await fetch('/api/upload_photo', { method: 'POST', body: formData });
+                const data = await response.json();
+                if (data.status === 'success') {
+                    alert(data.message); location.reload(); 
+                } else { alert("Error: " + data.message); btn.innerText = "Upload Image"; btn.disabled = false; }
+            } catch (error) { alert("Failed to upload."); }
+        }
+
+        async function addNewBarangay() {
+            const name = prompt("New Barangay Name:");
+            if(name && name.trim() !== "") {
+                try {
+                    const response = await fetch('/api/add_barangay', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: name.trim() }) });
+                    const data = await response.json();
+                    alert(data.message); if(data.status === 'success') location.reload();
+                } catch (error) { alert("Connection failed."); }
+            }
+        }
+
+        async function fireAdmin(adminId) {
+            if(confirm("⚠️ Fire this admin?")) {
+                try {
+                    const response = await fetch(`/api/delete_admin/${adminId}`, { method: 'POST' });
+                    const data = await response.json();
+                    alert(data.message); if(data.status === 'success') location.reload();
+                } catch (error) { alert("Connection failed."); }
+            }
+        }
+
+        async function editAdmin(adminId, currentName) {
+            const newName = prompt("Updated full name:", currentName);
+            if(newName && newName.trim() !== "" && newName !== currentName) {
+                try {
+                    const response = await fetch(`/api/edit_admin/${adminId}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ full_name: newName.trim() }) });
+                    const data = await response.json();
+                    alert(data.message); if(data.status === 'success') location.reload();
+                } catch (error) { alert("Connection failed."); }
+            }
+        }
+
+        async function deleteActivityLog(logId) {
+            if(confirm("Are you sure you want to delete this activity log?")) {
+                try {
+                    const response = await fetch(`/api/delete_log/${logId}`, { method: 'POST' });
+                    const data = await response.json();
+                    if(data.status === 'success') {
+                        location.reload(); 
+                    } else { 
+                        alert("Error: " + data.message); 
+                    }
+                } catch (error) { alert("Failed to communicate with the server."); }
+            }
+        }
+    </script>
+</body>
+</html>

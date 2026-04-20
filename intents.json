@@ -1,0 +1,174 @@
+{
+  "intents": [
+    {
+      "tag": "greeting",
+      "patterns": [
+        "Hi",
+        "Hello",
+        "Hey",
+        "How are you",
+        "What's up"
+      ],
+      "responses": [
+        "Hello! How can I help you today?",
+        "Hi there! What can I do for you?",
+        "Hey! I'm the OpenMuni assistant. Ask me anything about local projects."
+      ]
+    },
+    {
+      "tag": "goodbye",
+      "patterns": [
+        "Bye",
+        "Goodbye",
+        "See you later",
+        "Talk to you later"
+      ],
+      "responses": [
+        "Goodbye! Have a great day!",
+        "See you later! Feel free to ask me anything anytime.",
+        "Bye! Come back soon."
+      ]
+    },
+    {
+      "tag": "thanks",
+      "patterns": [
+        "Thanks",
+        "Thank you",
+        "That's helpful"
+      ],
+      "responses": [
+        "You're welcome!",
+        "Happy to help!",
+        "My pleasure."
+      ]
+    },
+    {
+      "tag": "about",
+      "patterns": [
+        "What is OpenMuni?",
+        "Tell me about OpenMuni",
+        "What is this website for?"
+      ],
+      "responses": [
+        "OpenMuni is a platform for transparency in local government projects. You can view proposed and ongoing projects in your municipality."
+      ]
+    },
+    {
+      "tag": "projects",
+      "patterns": [
+        "Show me the projects",
+        "What projects are there?",
+        "Can I see the list of projects?",
+        "Are there any new projects?"
+      ],
+      "responses": [
+        "You can view all public projects on the 'Projects' page.",
+        "To see the latest projects, please visit the 'Projects' section of this website."
+      ]
+    },
+    {
+      "tag": "transparency",
+      "patterns": [
+        "Where is the transparency seal?",
+        "Tell me about transparency",
+        "What is the transparency page for?"
+      ],
+      "responses": [
+        "You can find the transparency seal and related information on the 'Transparency' page.",
+        "The 'Transparency' page provides information about the municipality's commitment to openness and accountability."
+      ]
+    },
+    {
+        "tag": "login",
+        "patterns": [
+          "How do I log in?",
+          "Where is the login page?",
+          "I want to log in"
+        ],
+        "responses": [
+          "You can log in by clicking the 'Login' button on the top right of the page.",
+          "The login page is accessible from the main menu."
+        ]
+    },
+    {
+      "tag": "ask_budget",
+      "patterns": [
+        "how much is the budget for", "what is the cost of", "how much money was spent on", "budget of the project", "total cost"
+      ],
+      "responses": [""] 
+    },
+    {
+      "tag": "ask_location",
+      "patterns": [
+        "where is it located", "what barangay is it in", "location of the", "where can i find the", "address of"
+      ],
+      "responses": [""]
+    },
+    {
+      "tag": "ask_proposer",
+      "patterns": [
+        "who proposed the", "who submitted the", "which admin created", "who is the author of", "who requested"
+      ],
+      "responses": [""]
+    },
+    {
+      "tag": "ask_date",
+      "patterns": [
+        "when will the project start", "what is the start date for", "when is the target completion for", 
+        "when does the construction begin", "when will they finish the", "what is the timeline for", 
+        "tell me the deadline of the", "when is the project starting", "when will it be completed"
+      ],
+      "responses": [""]
+    },
+    {
+      "tag": "ask_status",
+      "patterns": [
+        "what is the status of", "is the project approved yet", "is it still in progress", 
+        "has it been finished", "is the construction completed", "tell me the current status for", 
+        "what phase is the project in", "is it done", "has the construction started yet"
+      ],
+      "responses": [""]
+    },
+    {
+      "tag": "how_to_propose",
+      "patterns": [
+        "how do i propose a project", "where can i submit a proposal", "can i suggest a new project", 
+        "how to request a road repair", "steps to propose a renovation", "i want to submit a project idea",
+        "who can propose a project", "how does project submission work"
+      ],
+      "responses": [
+        "To propose a project, you need to be logged into an official account. Once logged in, navigate to your Dashboard and fill out the 'Propose New Project' form with the title, budget, and location details."
+      ]
+    },
+    {
+      "tag": "account_help",
+      "patterns": [
+        "how do i get an account", "i forgot my password", "can citizens create an account", 
+        "who gets to be an admin", "how to login", "i can't access my dashboard"
+      ],
+      "responses": [
+        "Currently, accounts are restricted to Sub-Admins and Super Admins. If you are a local official and need access, please contact the Super Admin to have your account generated."
+      ]
+    },
+    {
+      "tag": "contact_support",
+      "patterns": [
+        "how do i contact the mayor", "who do i call for help", "where is the municipal hall", 
+        "contact number for support", "i want to report a bug on the website", "who manages this portal"
+      ],
+      "responses": [
+        "For technical issues with the OpenMuni portal or to reach the municipal office, please visit the 'About' page or contact your local barangay hall directly during working hours."
+      ]
+    },
+    {
+      "tag": "ask_barangay_info",
+      "patterns": [
+        "what barangays are included", "how many barangays are in the system", "show me barangay projects",
+        "which areas are covered", "does my barangay have projects"
+      ],
+      "responses": [
+        "OpenMuni tracks projects across all registered barangays in the municipality. You can view the specific barangay for each project on the 'Public Projects' page!"
+      ]
+    }
+  ]
+}
