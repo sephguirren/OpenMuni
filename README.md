@@ -1,29 +1,71 @@
 # OpenMuni
 
-## System Description
-OpenMuni is a comprehensive web-based platform designed to enhance transparency and streamline project management for municipalities and local government units. The system provides a dual-faceted approach: a public-facing portal for citizens to view and track local projects, and a secure administrative dashboard for officials to propose, manage, and monitor projects across different barangays. To further improve accessibility, OpenMuni integrates an intelligent, NLP-powered AI chatbot capable of answering real-time citizen queries regarding project budgets, locations, timelines, and statuses.
+<!-- Optional: Add badges here, e.g., build status, license, python version -->
+![Python](https://img.shields.io/badge/Python-3.x-blue?style=flat-square&logo=python)
+![Flask](https://img.shields.io/badge/Flask-Backend-black?style=flat-square&logo=flask)
+![MongoDB](https://img.shields.io/badge/MongoDB-Database-success?style=flat-square&logo=mongodb)
+![TensorFlow](https://img.shields.io/badge/TensorFlow-AI-orange?style=flat-square&logo=tensorflow)
 
-## Features
-- **Public Transparency Portal:** Allows citizens to search and view ongoing, completed, and proposed local projects across different barangays.
-- **Role-Based Access Control:** Secure login system supporting multiple roles (Super Admins and Sub Admins) to ensure proper data governance and delegation.
-- **Admin Dashboard:** Comprehensive dashboard with real-time statistics, including interactive charts for tracking project statuses and annual budget vs. expenses.
-- **Project Management:** End-to-end tracking of projects from proposal to completion, including budget allocation, timelines, and specific location mapping.
-- **Progress Photo Uploads:** Allows authorized users to upload images documenting project milestones and progress.
-- **Activity Logging:** Automated logging of administrative actions to maintain a clear audit trail of system changes.
-- **Barangay & User Management:** Super Admins can add new barangays and manage Sub Admin accounts for localized project handling.
-- **Smart AI Chatbot:** An integrated NLP chatbot that dynamically queries the database to answer specific user questions like "What is the budget for [Project]?" or "What is the status of [Project]?".
+> Empowering local governance through transparency, streamlined project management, and AI-driven accessibility.
 
-## Tech Stack
-### Backend
-- **Framework:** Python / Flask
-- **Database:** MongoDB (PyMongo)
-- **File Handling:** Werkzeug (Secure Filenames)
+## Description
 
-### Frontend
-- **Templating:** Jinja2 (HTML)
-- **Styling & Interactivity:** CSS / JavaScript (Client-side logic and Charts)
+OpenMuni enhances municipal transparency through a public-facing portal for citizens to track local projects, a secure administrative dashboard for officials to manage them, and an NLP-powered AI chatbot to answer real-time citizen queries regarding budgets and timelines.
 
-### AI & Machine Learning (Chatbot)
-- **Deep Learning Framework:** TensorFlow / Keras (Neural Network Model)
-- **Natural Language Processing:** NLTK (WordNetLemmatizer, Tokenization)
-- **Data Processing:** NumPy, Pickle
+## 🌟 Key Features
+
+*   **Public Portal & Admin Dashboard:** View and manage ongoing projects across barangays.
+*   **Role-Based Access:** Secure delegation for Super Admins and Sub Admins.
+*   **End-to-End Tracking:** Manage proposals, budgets, timelines, and progress photos.
+*   **Smart AI Chatbot:** NLP-driven bot to answer specific user questions instantly.
+
+## 🛠 Tech Stack
+
+*   **Backend:** Python / Flask, MongoDB (PyMongo), Werkzeug
+*   **Frontend:** Jinja2 (HTML), CSS / JavaScript
+*   **AI (Chatbot):** TensorFlow / Keras, NLTK, NumPy, Pickle
+
+## 🚀 Installation & Setup
+
+### Development Setup
+```bash
+# 1. Clone the repository
+git clone [https://github.com/sephguirren/openmuni.git](https://github.com/sephguirren/openmuni.git)
+cd openmuni
+
+# 2. Set up virtual environment & install dependencies
+python3 -m venv venv
+source venv/bin/activate  # On Windows use: venv\Scripts\activate
+pip install -r requirements.txt
+
+# 3. Configure .env file
+# Add: FLASK_APP=app.py, SECRET_KEY, and MONGO_URI
+
+# 4. Run the application
+flask run
+```
+
+## 💻 Usage Example
+
+Once running, navigate to `http://localhost:5000`. Citizens can view projects and ask the AI chatbot questions directly. Administrators can navigate to `/admin` to log in, propose projects, and upload progress updates.
+
+## 📋 Release History
+
+*   **0.1.0**
+    *   Initial release: Project Management, Transparency Portal, and AI Chatbot integration.
+
+## 👤 Meta
+
+Mark Joseph B. Guirren – [LinkedIn](https://www.linkedin.com/in/mark-joseph-guirren-080742403/) – sephbergonia@gmail.com
+
+Distributed under the MIT license. See `LICENSE` for more information.
+
+[https://github.com/sephguirren/openmuni](https://github.com/sephguirren/openmuni)
+
+## 🤝 Contributing
+
+1.  Fork it (https://github.com/sephguirren/openmuni/fork)
+2.  Create your feature branch (`git checkout -b feature/fooBar`)
+3.  Commit your changes (`git commit -am 'Add some fooBar'`)
+4.  Push to the branch (`git push origin feature/fooBar`)
+5.  Create a new Pull Request
